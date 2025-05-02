@@ -69,7 +69,7 @@ To safely test this module, a public S3 bucket was created with the following co
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourname/s3_bucket_scanner.git
+git clone https://github.com/GIN963/s3_bucket_scanner.git
 ```
 
 2. Copy the Ruby module to your Metasploit modules directory:
@@ -122,7 +122,6 @@ run
 ## Author
 
 👤 **n4n0n3t**
-💼 Developed as part of a cybersecurity university project
 
 ---
 
