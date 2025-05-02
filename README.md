@@ -119,12 +119,6 @@ run
 
 ---
 
-## Author
-
-👤 **n4n0n3t**
-
----
-
 ## Disclaimer
 
 ⚠️ This module is for **educational purposes only** or for use in authorized environments (e.g., bug bounty, labs, internal testing). **Never use this tool on production systems or real infrastructure without explicit permission.** All AWS credentials shown in this documentation are **fake** and used for demonstration purposes only.
