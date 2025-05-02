@@ -75,7 +75,7 @@ git clone https://github.com/GIN963/s3_bucket_scanner.git
 2. Copy the Ruby module to your Metasploit modules directory:
 
 ```bash
-cp s3_bucket_scanner.rb ~/.msf4/modules/auxiliary/cloud/
+cp s3_bucket_scanner.rb ~/.msf4/modules/auxiliary/scanner/
 ```
 
 3. Restart Metasploit:
