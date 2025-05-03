@@ -71,7 +71,7 @@ class MetasploitModule < Msf::Auxiliary
     begin
       response = Net::HTTP.get_response(uri)
       if response.body.include?('<ListBucketResult')
-        response.body.scan(/<Key>(.*?)<\\/Key>/).each do |match|
+        response.body.scan(/<Key>(.*?)<\/Key>/).each do |match|
           files << match[0]
         end
       end
