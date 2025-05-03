@@ -1,124 +1,106 @@
-# ☁️ AWS S3 Bucket Secrets Scanner (Metasploit Module)
+# AWS S3 Bucket Secrets Scanner
 
-## Description
-
-`AWS S3 Bucket Secrets Scanner` is a custom **Metasploit auxiliary module** designed to scan publicly accessible AWS S3 buckets and analyze their contents for sensitive information. It helps identify potential security exposures by extracting files and detecting common types of secrets such as:
-
-* AWS Access Keys
-* JWT Tokens
-* Plaintext Passwords
-* Private Keys (RSA, EC, DSA)
-* API Keys
-
-This module is particularly useful during **cloud pentesting** and **red team operations** targeting misconfigured storage resources.
+This is a custom **Metasploit auxiliary module** designed to scan **public AWS S3 buckets** for **sensitive data** such as AWS credentials, private keys, API keys, JWTs, and passwords.
 
 ---
 
-## Features
+## 🔧 Features
 
-- Scans a given public S3 bucket
-- Lists files if the bucket allows listing
-- Downloads and analyzes each accessible file
-- Automatically detects several secret patterns
-- Exports results in both plain text and structured JSON
-- Supports scan throttling via configurable delay
-
----
-
-## Demo Bucket Configuration
-
-To safely test this module, a public S3 bucket was created with the following configuration:
-
-### Example Bucket: `vuln-bucket-n4n0n3t`
-
-#### 🔧 Bucket Setup
-
-* **Name**: `vuln-bucket-n4n0n3t`
-* **Region**: `us-east-1`
-* **Public Access**: Enabled (`s3:GetObject` allowed for all)
-* **Object Listing**: Enabled
-* **Files Included**:
-
-  * `secrets.txt` – fake AWS key
-  * `config.json` – contains mock API key
-  * `jwt.token` – dummy JWT
-  * `credentials.env` – credentials sample
-  * `notes.txt` – harmless file
-
-#### 📜 Bucket Policy
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadGetObject",
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::vuln-bucket-n4n0n3t/*"
-    }
-  ]
-}
-```
+- Scans public S3 buckets for accessible files
+- Detects sensitive data inside files using regex patterns:
+  - AWS Access Keys (AKIA...)
+  - API Keys & Tokens
+  - JWTs
+  - Private keys
+  - Passwords and login info (key-value or SQL format)
+  - Database URIs
+- Can optionally **bruteforce object names** using a wordlist if the bucket does not allow listing
+- Exports findings to both `.txt` and `.json` in Metasploit's `loot` directory
 
 ---
 
-## Installation
+## 🚀 Usage
 
-1. Clone the repository:
+### 1. Drop the module in Metasploit custom module path:
 
 ```bash
-git clone https://github.com/GIN963/s3_bucket_scanner.git
-```
-
-2. Copy the Ruby module to your Metasploit modules directory:
-
-```bash
+mkdir -p ~/.msf4/modules/auxiliary/scanner
 cp s3_bucket_scanner.rb ~/.msf4/modules/auxiliary/scanner/
 ```
 
-3. Restart Metasploit:
+### 2. Reload Metasploit modules:
 
 ```bash
 msfconsole
+reload_all
 ```
 
----
-
-## Usage
+### 3. Use the module:
 
 ```bash
-use auxiliary/cloud/s3_bucket_scanner
+use auxiliary/scanner/s3_bucket_scanner
 set BUCKET_NAME vuln-bucket-n4n0n3t
-set TIMEOUT 1
 run
 ```
 
-### Sample Output:
+---
 
+## ⚙️ Options
+
+| Name        | Required | Description                                           |
+|-------------|----------|-------------------------------------------------------|
+| `BUCKET_NAME` | ✅       | Name of the public S3 bucket (without `.s3.amazonaws.com`) |
+| `TIMEOUT`     | ❌       | Delay (in seconds) between requests (default: `2`)     |
+| `WORDLIST`    | ❌       | Path to a wordlist of filenames to bruteforce objects |
+
+---
+
+## 🧠 About `WORDLIST`
+
+If the bucket is **public but listing is disabled**, the module can try to guess filenames using a **bruteforce wordlist**. This allows discovery of hidden objects like:
+
+```txt
+config.env
+credentials.txt
+secret_key.json
 ```
+
+Use it like this:
+
+```bash
+set WORDLIST /path/to/wordlist.txt
+```
+
+📌 You do **not** need `WORDLIST` if `list_bucket_files` works (i.e. bucket listing is enabled).
+
+A good starter wordlist: `raft-small-files.txt` from [SecLists](https://github.com/danielmiessler/SecLists)
+
+---
+
+## 📝 Example Output
+
+```bash
 [*] Starting scan on bucket: vuln-bucket-n4n0n3t
-[+] Found 5 files in bucket vuln-bucket-n4n0n3t
-[*] Scanning file: secrets.txt
-[!] Secrets found in secrets.txt:
-    - AWS Access Key(s): AKIA1234567890TEST
-[*] Scanning file: config.json
-[!] Secrets found in config.json:
-    - API Key(s): api_key = "abcd1234efgh5678ijkl"
-...
-[+] Exported JSON results to ~/.msf4/loot/s3_secrets_vuln-bucket-n4n0n3t.json
+[+] Found 6 files in bucket vuln-bucket-n4n0n3t
+[*] Scanning file: config.env
+[!] Secrets found in config.env:
+[+]     - AWS Access Key(s): AKIAIOSFODNN7EXAMPLE
+[+]     - Password(s): hunter2
+[*] Scanning file: credentials.txt
+[!] Secrets found in credentials.txt:
+[+]     - API Key(s) / Token(s): sk_test_abc123...
+[*] Auxiliary module execution completed
 ```
 
 ---
 
-## Requirements
+## 📂 Output Files
 
-* Metasploit Framework
-* Ruby >= 2.5
+- `~/.msf4/loot/s3_secrets_<bucket>.txt` — plain text results
+- `~/.msf4/loot/s3_secrets_<bucket>.json` — structured output
 
 ---
 
-## Disclaimer
+## ⚠️ Disclaimer
 
-⚠️ This module is for **educational purposes only** or for use in authorized environments (e.g., bug bounty, labs, internal testing). **Never use this tool on production systems or real infrastructure without explicit permission.** All AWS credentials shown in this documentation are **fake** and used for demonstration purposes only.
+This module is for **educational and authorized testing** only. Do not use against systems or buckets you do not have permission to scan.
