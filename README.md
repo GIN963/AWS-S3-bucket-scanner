@@ -1,4 +1,4 @@
-# AWS S3 Bucket Secrets Scanner
+# ☁️ AWS S3 Bucket (Secrets) Scanner
 
 This is a custom **Metasploit auxiliary module** designed to scan **public AWS S3 buckets** for **sensitive data** such as AWS credentials, private keys, API keys, JWTs, and passwords.
 
