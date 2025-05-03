@@ -25,7 +25,7 @@ This is a custom **Metasploit auxiliary module** designed to scan **public AWS S
 
 ```bash
 mkdir -p ~/.msf4/modules/auxiliary/scanner
-cp s3_bucket_scanner.rb ~/.msf4/modules/auxiliary/scanner/
+mv /path/to/s3_bucket_scanner.rb ~/.msf4/modules/auxiliary/scanner/
 ```
 
 ### 2. Reload Metasploit modules:
